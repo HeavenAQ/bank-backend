@@ -24,5 +24,6 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	defer dbpool.Close()
+	testQueries = New(dbpool)
 	m.Run()
 }
