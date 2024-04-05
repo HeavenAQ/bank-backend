@@ -37,3 +37,25 @@ CREATE INDEX ON "transfers" ("from_account_id", "to_account_id");
 COMMENT ON COLUMN "entries"."amount" IS 'can be negative or positive';
 
 COMMENT ON COLUMN "transfers"."amount" IS 'must be positive';
+
+CREATE FUNCTION update_updated_at ()
+    RETURNS TRIGGER
+    AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER on_update_updated_at
+    BEFORE UPDATE ON accounts FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at ();
+
+CREATE TRIGGER on_update_updated_at
+    BEFORE UPDATE ON entries FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at ();
+
+CREATE TRIGGER on_update_updated_at
+    BEFORE UPDATE ON transfers FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at ();
