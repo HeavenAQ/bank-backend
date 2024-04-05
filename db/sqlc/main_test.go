@@ -15,15 +15,17 @@ const (
 )
 
 var testQueries *Queries
+var testStore *Store
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
-	dbpool, err := pgxpool.New(ctx, dbSource)
+	testDBPool, err := pgxpool.New(ctx, dbSource)
 	if err != nil {
 		log.Printf("Unable to create connection pool: %v\n", err)
 		os.Exit(1)
 	}
-	defer dbpool.Close()
-	testQueries = New(dbpool)
+	defer testDBPool.Close()
+	testQueries = New(testDBPool)
+	testStore = NewStore(testDBPool)
 	m.Run()
 }
