@@ -138,6 +138,11 @@ func TestTransferTxIncreaseDecreaseAmount(t *testing.T) {
 		go transfer(i%2 == 0)
 	}
 
+	for e := 0; e < n; e++ {
+		err := <-errs
+		require.NoError(t, err)
+	}
+
 	// check the final updated balance
 	updatedAccount1, err := testQueries.GetAccount(context.Background(), account1.ID)
 	require.NoError(t, err)
