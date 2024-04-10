@@ -120,20 +120,22 @@ func TestTransferTxIncreaseDecreaseAmount(t *testing.T) {
 	errs := make(chan error)
 
 	for i := 0; i < n; i++ {
-		fromAccountID := account1.ID
-		toAccountID := account2.ID
-		if i%2 == 0 {
-			fromAccountID = account2.ID
-			toAccountID = account1.ID
-		}
-		go func() {
+		transfer := func(reversed bool) {
+			fromAccount := account1
+			toAccount := account2
+
+			if reversed {
+				fromAccount = account2
+				toAccount = account1
+			}
 			_, err := testStore.TransferTx(context.Background(), TransferTxParams{
-				FromAccountID: fromAccountID,
-				ToAccountID:   toAccountID,
+				FromAccountID: fromAccount.ID,
+				ToAccountID:   toAccount.ID,
 				Amount:        amount,
 			})
 			errs <- err
-		}()
+		}
+		go transfer(i%2 == 0)
 	}
 
 	// check the final updated balance
