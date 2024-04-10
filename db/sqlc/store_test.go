@@ -115,27 +115,25 @@ func TestTransferTxIncreaseDecreaseAmount(t *testing.T) {
 	account2 := createRandomAccount(t)
 
 	// run a concurrent transfer transactions
-	n := 5
+	n := 10
 	amount := int64(10)
 	errs := make(chan error)
 
 	for i := 0; i < n; i++ {
+		fromAccountID := account1.ID
+		toAccountID := account2.ID
+		if i%2 == 0 {
+			fromAccountID = account2.ID
+			toAccountID = account1.ID
+		}
 		go func() {
-			result, err := testStore.TransferTx(context.Background(), TransferTxParams{
-				FromAccountID: account1.ID,
-				ToAccountID:   account2.ID,
+			_, err := testStore.TransferTx(context.Background(), TransferTxParams{
+				FromAccountID: fromAccountID,
+				ToAccountID:   toAccountID,
 				Amount:        amount,
 			})
-
-			// send the result and error to the respective channels
 			errs <- err
-			results <- result
 		}()
-	}
-
-	// check results
-	existed := make(map[int]bool)
-	for i := 0; i < n; i++ {
 	}
 
 	// check the final updated balance
